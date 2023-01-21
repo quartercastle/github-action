@@ -1,0 +1,25 @@
+name: release
+
+on:
+  workflow_call:
+    secrets:
+      token:
+        required: true
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+
+    - name: Release
+      env:
+        GITHUB_TOKEN: ${{ secrets.token }}
+      run: |
+        if [[ "${GITHUB_REF#refs/*/}" == *"-rc"* ]]; then
+          gh release create "${GITHUB_REF#refs/*/}" --prerelease --title=$tag --generate-notes
+        else
+          gh release create "${GITHUB_REF#refs/*/}" --title=$tag --generate-notes
+        fi
+
