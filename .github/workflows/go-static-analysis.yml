@@ -1,0 +1,35 @@
+name: static-analysis
+
+on:
+  workflow_call:
+    inputs:
+      go:
+        required: true
+        type: string
+
+jobs:
+  static-analysis:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: ${{ inputs.go }}
+
+      - name: Vetting
+        run: go vet ./...
+
+      - name: Static check
+        uses: dominikh/staticcheck-action@v1.1.0
+        with:
+          version: "2021.1.2"
+
+      - name: Building
+        run: go build -v ./...
+
+      - name: Testing
+        run: go test --race ./...
+
+
